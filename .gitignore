@@ -1,4 +1,7 @@
 .idea/
 .vscode/
 
+build/
+dist/
+ml-metrics.egg-info/
 env/
