@@ -8,12 +8,12 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 setuptools.setup(
-    name="ml-metrics",
+    name="cv-metrics",
     version='0.0.1',
-    description="Metrics To Evaluate Machine Learning Algorithms in Python",
+    description="Metrics To Evaluate Computer Vision Algorithms in Python",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/SkalskiP/ml-metrics",
+    url="https://github.com/SkalskiP/cv-metrics",
     author="Piotr Skalski",
     author_email="piotr.skalski92@gmail.com",
     license='BSD',

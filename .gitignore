@@ -3,5 +3,5 @@
 
 build/
 dist/
-ml-metrics.egg-info/
+cv_metrics.egg-info/
 env/
