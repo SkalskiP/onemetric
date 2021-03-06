@@ -1,7 +1,7 @@
 <h1 align="center">onemetric</h1>
 
 <p align="center"> 
-    <img width="180" src=".//readme_figures/onemetric.png" alt="Logo">
+    <img width="180" src="https://onemetric-images.s3.eu-central-1.amazonaws.com/onemetric-logo.png" alt="Logo">
 </p>
 
 ## Installation

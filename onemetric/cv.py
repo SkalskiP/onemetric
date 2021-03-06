@@ -1,4 +1,9 @@
-def box_iou(box_true, box_prediction):
+from typing import Tuple
+
+import numpy as np
+
+
+def box_iou(box_true: Tuple[float, float, float, float], box_prediction: Tuple[float, float, float, float]) -> float:
     """
     Compute Intersection over Union of two bounding boxes.
     :param box_true: Ground-truth bounding boxes. [x_min, y_min, x_max, y_max]
@@ -8,7 +13,7 @@ def box_iou(box_true, box_prediction):
     pass
 
 
-def mask_iou(mask_true, mask_prediction):
+def mask_iou(mask_true: np.array, mask_prediction: np.array) -> float:
     """
     Compute Intersection over Union of two masks.
     :param mask_true: Ground-truth mask.

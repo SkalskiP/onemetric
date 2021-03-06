@@ -9,7 +9,7 @@ README = (HERE / "README.md").read_text()
 
 setuptools.setup(
     name="onemetric",
-    version='0.0.1',
+    version='0.0.0.1',
     python_requires=">=3.6",
     description="Metrics Library to Evaluate Machine Learning Algorithms in Python",
     long_description=README,
@@ -18,7 +18,7 @@ setuptools.setup(
     author="Piotr Skalski",
     author_email="piotr.skalski92@gmail.com",
     license='BSD',
-    packages=setuptools.find_packages(exclude=('tests',)),
+    packages=setuptools.find_packages(exclude=('tests', 'venv',)),
     include_package_data=True,
     install_requires=[
         "numpy",
@@ -29,16 +29,21 @@ setuptools.setup(
     },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
-        'License :: OSI Approved :: BSD License',
-        'Operating System :: POSIX :: Linux',
-        'Operating System :: MacOS :: MacOS X',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: BSD License',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
-        'Topic :: Software Development :: Libraries',
-        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3 :: Only',
+        'Topic :: Software Development',
+        'Topic :: Scientific/Engineering',
+        'Typing :: Typed',
+        'Operating System :: Microsoft :: Windows',
+        'Operating System :: POSIX',
+        'Operating System :: Unix',
+        'Operating System :: MacOS'
     ]
 )
