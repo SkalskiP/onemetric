@@ -1,3 +1,5 @@
+[![PyPI version](https://badge.fury.io/py/onemetric.svg)](https://badge.fury.io/py/onemetric)
+
 <h1 align="center">onemetric</h1>
 
 <p align="center"> 
