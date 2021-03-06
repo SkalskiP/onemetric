@@ -1,5 +1,9 @@
 <h1 align="center">onemetric</h1>
 
+<p align="center"> 
+    <img width="180" src=".//readme_figures/onemetric.png" alt="Logo">
+</p>
+
 ## Installation
 
 ```terminal
