@@ -3,5 +3,7 @@
 
 build/
 dist/
-cv_metrics.egg-info/
+onemetric.egg-info/
+
 env/
+venv/
