@@ -9,7 +9,7 @@ README = (HERE / "README.md").read_text()
 
 setuptools.setup(
     name="onemetric",
-    version='0.0.0.1',
+    version='0.0.1',
     python_requires=">=3.6",
     description="Metrics Library to Evaluate Machine Learning Algorithms in Python",
     long_description=README,
