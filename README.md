@@ -14,7 +14,7 @@ pip install onemetric
 
 ## Contribute
 
-Feel free to file [issues](https://github.com/SkalskiP/onemetric/issues) or [pull requests](https://github.com/SkalskiP/onemetric/pulls). 
+Feel free to file [issues](https://github.com/SkalskiP/onemetric/issues) or [pull requests](https://github.com/SkalskiP/onemetric/pulls). Let us know what metrics should be part of onemetric!
 
 ## Citation
 
