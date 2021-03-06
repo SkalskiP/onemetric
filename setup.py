@@ -8,13 +8,13 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 setuptools.setup(
-    name="cv_metrics",
+    name="onemetric",
     version='0.0.1',
     python_requires=">=3.6",
-    description="Metrics To Evaluate Computer Vision Algorithms in Python",
+    description="Metrics Library to Evaluate Machine Learning Algorithms in Python",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/SkalskiP/cv-metrics",
+    url="https://github.com/SkalskiP/onemetric",
     author="Piotr Skalski",
     author_email="piotr.skalski92@gmail.com",
     license='BSD',

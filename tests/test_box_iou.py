@@ -1,2 +1,2 @@
-from cv_metrics.core import box_iou
+from onemetric.cv import box_iou
 
