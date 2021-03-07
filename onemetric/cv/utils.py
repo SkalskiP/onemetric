@@ -4,18 +4,19 @@ import numpy as np
 
 
 def box_iou(
-    box_true: Tuple[float, float, float, float],
-    box_prediction: Tuple[float, float, float, float]
+        box_true: Tuple[float, float, float, float],
+        box_prediction: Tuple[float, float, float, float]
 ) -> Optional[float]:
     """
-    Compute Intersection over Union of two bounding boxes.
+    Compute Intersection over Union of two bounding boxes - box_true and box_prediction. Both boxes are expected to be
+    tuples in (x_min, y_min, x_max, y_max) format.
 
     Args:
-        box_true: Ground-truth bounding boxes. (x_min, y_min, x_max, y_max)
-        box_prediction: Prediction bounding boxes. (x_min, y_min, x_max, y_max)
+        box_true: Tuple representing ground-truth bounding boxes.
+        box_prediction: Tuple representing prediction bounding boxes.
 
     Returns:
-        Optional[float]: Float value between 0 and 1. None if union is equal to 0.
+        iou: Float value between 0 and 1. None if union is equal to 0.
     """
     _validate_box(box=box_true)
     _validate_box(box=box_prediction)
@@ -39,17 +40,44 @@ def box_iou(
     return area_intersection / area_union
 
 
-def mask_iou(mask_true: np.ndarray, mask_prediction: np.ndarray) -> Optional[float]:
+def box_iou_batch(boxes_true: np.ndarray, boxes_prediction: np.ndarray) -> np.ndarray:
     """
-    Compute Intersection over Union of two masks.
+    Compute Intersection over Union of two sets of bounding boxes - boxes_true and boxes_prediction. Both sets of boxes
+    are expected to be in (x_min, y_min, x_max, y_max) format. Updated version of
+    https://github.com/kaanakan/object_detection_confusion_matrix
 
     Args:
-        mask_true: Ground-truth mask. 2d np.ndarray with np.uint8 type and binary values (0/1).
-        mask_prediction: Prediction mask. 2d np.ndarray with np.uint8 type and binary values (0/1).
-        Shapes of mask_true and mask_prediction should be identical.
+        boxes_true: 2d np.ndarray representing ground-truth boxes. shape = (N, 4) where N is number of objects.
+        boxes_prediction: 2d np.ndarray representing prediction boxes. shape = (M, 4) where M is number of objects.
 
     Returns:
-        Optional[float]: Float value between 0 and 1. None if union is equal to 0.
+        iou: 2d np.ndarray representing pairwise Intersection over Union of boxes_true and boxes_prediction.
+    """
+
+    def box_area(box):
+        return (box[2] - box[0]) * (box[3] - box[1])
+
+    area_true = box_area(boxes_true.T)
+    area_prediction = box_area(boxes_prediction.T)
+
+    top_left = np.maximum(boxes_true[:, None, :2], boxes_true[:, :2])
+    bottom_right = np.minimum(boxes_prediction[:, None, 2:], boxes_prediction[:, 2:])
+
+    area_inter = np.prod(np.clip(bottom_right - top_left, a_min=0, a_max=None), 2)
+    return area_inter / (area_true[:, None] + area_prediction - area_inter)
+
+
+def mask_iou(mask_true: np.ndarray, mask_prediction: np.ndarray) -> Optional[float]:
+    """
+    Compute Intersection over Union of two masks - mask_true and mask_prediction. Shapes of mask_true and
+    mask_prediction should be identical. Both arrays are expected to be np.uint8 type and contain binary values (0 or 1).
+
+    Args:
+        mask_true: 2d np.ndarray representing ground-truth mask.
+        mask_prediction: 2d np.ndarray representing prediction mask.
+
+    Returns:
+        iou: Float value between 0 and 1. None if union is equal to 0.
     """
     _validate_mask(mask=mask_true)
     _validate_mask(mask=mask_prediction)

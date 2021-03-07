@@ -33,4 +33,10 @@ Please cite onemetric in your publications if this is useful for your research. 
 
 This project is licensed under the BSD 3 - see the [LICENSE][1] file for details.
 
-[1]: ./LICENSE
+## Sources
+
+1. Confusion Matrix for Object Detection [link](2) by [kaanakan](3)
+
+[1]: https://github.com/SkalskiP/onemetric/blob/master/LICENSE
+[2]: https://github.com/kaanakan/object_detection_confusion_matrix
+[3]: https://github.com/kaanakan

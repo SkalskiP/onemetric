@@ -1,9 +1,9 @@
-from typing import Tuple
+from typing import Tuple, Optional
 
 import pytest
 from contextlib import ExitStack as DoesNotRaise
 
-from onemetric.cv import box_iou, mask_iou
+from onemetric.cv.utils import box_iou, mask_iou, box_iou_batch
 
 import numpy as np
 
@@ -31,12 +31,44 @@ import numpy as np
 def test_box_iou(
     box_true: Tuple[float, float, float, float],
     box_prediction: Tuple[float, float, float, float],
-    expected_result: float,
+    expected_result: Optional[float],
     exc: Exception
 ) -> None:
     with exc:
         result = box_iou(box_true=box_true, box_prediction=box_prediction)
         assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "boxes_true, boxes_prediction, expected_result, exc",
+    [
+        (
+            np.array([
+                [0., 0., 1., 1.],
+                [2., 2., 2.5, 2.5]
+            ]),
+            np.array([
+                [0., 0., 1., 1.],
+                [2., 2., 2.5, 2.5]
+            ]),
+            np.array([
+                [1., 0.],
+                [0., 1.]
+            ]),
+            DoesNotRaise()
+        )
+    ]
+)
+def test_box_iou_batch(
+    boxes_true: np.ndarray,
+    boxes_prediction: np.ndarray,
+    expected_result: Optional[float],
+    exc: Exception
+) -> None:
+    with exc:
+        result = box_iou_batch(boxes_true=boxes_true, boxes_prediction=boxes_prediction)
+        print(result)
+        np.testing.assert_array_equal(result, expected_result)
 
 
 QUARTER_MASK = np.zeros((10, 10)).astype('uint8')
