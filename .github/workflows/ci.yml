@@ -14,4 +14,6 @@ jobs:
           python-version: 3.x
       - run: pip install mkdocs-material
       - run: python tools/autogen.py
+      - run: cp README.md docs/index.md
+      - run: cp LICENSE.md docs/LICENSE.md
       - run: mkdocs gh-deploy --force

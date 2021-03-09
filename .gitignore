@@ -6,6 +6,7 @@ build/
 dist/
 onemetric.egg-info/
 docs/
+site/
 
 env/
 venv/
