@@ -2,7 +2,6 @@ site_name: onemetric
 site_author: Piotr Skalski
 
 nav:
-  - Home: index.md
   - API reference:
       - Computer Vision:
           - Object Detection: cv/object_detection.md
