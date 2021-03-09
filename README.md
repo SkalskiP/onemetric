@@ -1,6 +1,8 @@
 [![PyPI version](https://badge.fury.io/py/onemetric.svg)](https://badge.fury.io/py/onemetric)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/onemetric)
 ![PyPI - License](https://img.shields.io/pypi/l/onemetric)
+[![codecov](https://codecov.io/gh/SkalskiP/onemetric/branch/master/graph/badge.svg?token=ZFSEYF9WN4)](https://codecov.io/gh/SkalskiP/onemetric)
+![tests](https://github.com/SkalskiP/onemetric/actions/workflows/tests.yml/badge.svg)
 
 <h1 align="center">onemetric</h1>
 
