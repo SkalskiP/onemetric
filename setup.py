@@ -25,7 +25,11 @@ setuptools.setup(
         "matplotlib"
     ],
     extras_require={
-        'tests': ['pytest']
+        'tests': [
+            'pytest',
+            'pytest-cov',
+            'coverage',
+        ]
     },
     classifiers=[
         'Development Status :: 5 - Production/Stable',
