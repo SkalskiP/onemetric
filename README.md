@@ -1,4 +1,6 @@
 [![PyPI version](https://badge.fury.io/py/onemetric.svg)](https://badge.fury.io/py/onemetric)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/onemetric)
+![PyPI - License](https://img.shields.io/pypi/l/onemetric)
 
 <h1 align="center">onemetric</h1>
 
@@ -33,7 +35,7 @@ Please cite onemetric in your publications if this is useful for your research. 
 
 This project is licensed under the BSD 3 - see the [LICENSE][1] file for details.
 
-## Sources
+## Acknowledgements
 
 1. Confusion Matrix for Object Detection [link](2) by [kaanakan](3)
 
