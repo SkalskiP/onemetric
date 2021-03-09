@@ -18,7 +18,7 @@ setuptools.setup(
     author="Piotr Skalski",
     author_email="piotr.skalski92@gmail.com",
     license='BSD',
-    packages=setuptools.find_packages(exclude=('tests', 'venv',)),
+    packages=['onemetric'],
     include_package_data=True,
     install_requires=[
         "numpy",

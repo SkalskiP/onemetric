@@ -14,6 +14,10 @@
 pip install onemetric
 ```
 
+## Documentation
+
+The official documentation is hosted on Github Pages: https://skalskip.github.io/onemetric
+
 ## Contribute
 
 Feel free to file [issues](https://github.com/SkalskiP/onemetric/issues) or [pull requests](https://github.com/SkalskiP/onemetric/pulls). Let us know what metrics should be part of onemetric!
@@ -38,7 +42,10 @@ This project is licensed under the BSD 3 - see the [LICENSE][1] file for details
 ## Acknowledgements
 
 1. Confusion Matrix for Object Detection [link](2) by [kaanakan](3)
+2. Mean Average Precision for Object Detection [link](4) by [bes-dev](5)
 
 [1]: https://github.com/SkalskiP/onemetric/blob/master/LICENSE
 [2]: https://github.com/kaanakan/object_detection_confusion_matrix
 [3]: https://github.com/kaanakan
+[4]: https://github.com/bes-dev/mean_average_precision
+[5]: https://github.com/bes-dev
