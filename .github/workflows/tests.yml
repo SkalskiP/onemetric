@@ -31,7 +31,7 @@ jobs:
         pip install -e ".[tests]" --progress-bar off --upgrade
     - name: Test with pytest
       run: |
-        pytest --cov=autokeras --cov-report xml:coverage.xml
+        pytest --cov=onemetric --cov-report xml:coverage.xml
     - name: Codecov
       uses: codecov/codecov-action@v1
       with:
