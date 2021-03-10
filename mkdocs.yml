@@ -16,9 +16,15 @@ theme:
     accent: 'indigo'
   logo: 'img/logo.png'
   favicon: 'img/favicon.png'
+  features:
+    - navigation.expand
+  icon:
+    repo: fontawesome/brands/github
 
 repo_name: 'SkalskiP/onemetric'
 repo_url: 'https://github.com/SkalskiP/onemetric'
 
+
 markdown_extensions:
-  - codehilite
+  - pymdownx.highlight
+  - pymdownx.superfences

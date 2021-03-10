@@ -8,7 +8,7 @@ def box_iou(
     box_detection: Tuple[float, float, float, float]
 ) -> Optional[float]:
     """
-    Compute Intersection over Union of two bounding boxes - box_true and box_detection. Both boxes are expected to be
+    Compute Intersection over Union of two bounding boxes - `box_true` and `box_detection`. Both boxes are expected to be
     tuples in `(x_min, y_min, x_max, y_max)` format.
 
     Args:
@@ -16,7 +16,20 @@ def box_iou(
         box_detection: `tuple` representing detection bounding boxes.
 
     Returns:
-        iou: `float` value between 0 and 1. None if union is equal to 0.
+        iou: `float` value between 0 and 1. `None` if union is equal to 0.
+
+    Example:
+    ```
+    >>> from onemetric.utils import box_iou
+
+    >>> iou = box_iou_batch(
+    ...     boxes_true=(0., 0., 1., 1.),
+    ...     boxes_detection=(0.25, 0., 1.25, 1.)
+    ... )
+
+    >>> iou
+    0.6
+    ```
     """
     _validate_box(box=box_true)
     _validate_box(box=box_detection)
@@ -40,19 +53,44 @@ def box_iou(
     return area_intersection / area_union
 
 
+# Updated version of box_iou_batch from https://github.com/kaanakan/object_detection_confusion_matrix
+
+
 def box_iou_batch(boxes_true: np.ndarray, boxes_detection: np.ndarray) -> np.ndarray:
     """
-    Compute Intersection over Union of two sets of bounding boxes - boxes_true and boxes_detection. Both sets of boxes
-    are expected to be in `(x_min, y_min, x_max, y_max)` format. Updated version of
-    https://github.com/kaanakan/object_detection_confusion_matrix
+    Compute Intersection over Union of two sets of bounding boxes - `boxes_true` and b`oxes_detection`. Both sets of
+    boxes are expected to be in `(x_min, y_min, x_max, y_max)` format.
 
     Args:
-        boxes_true: 2d `np.ndarray` representing ground-truth boxes. `shape = (N, 4)` where N is number of objects.
-        boxes_detection: 2d `np.ndarray` representing detection boxes. `shape = (M, 4)` where M is number of objects.
+        boxes_true: 2d `np.ndarray` representing ground-truth boxes. `shape = (N, 4)` where N is number of true objects.
+        boxes_detection: 2d `np.ndarray` representing detection boxes. `shape = (M, 4)` where M is number of detected objects.
 
     Returns:
-        iou: 2d `np.ndarray` representing pairwise Intersection over Union of `boxes_true` and `boxes_detection`.
+        iou: 2d `np.ndarray` representing pairwise IoU of boxes from `boxes_true` and `boxes_detection`. `shape = (N, M)` where N is number of true objects and M is number of detected objects.
+
+    Example:
+    ```
+    >>> import numpy as np
+
+    >>> from onemetric.utils import box_iou_batch
+
+    >>> boxes_true = boxes_true=np.array([
+    ...     [0., 0., 1., 1.],
+    ...     [2., 2., 2.5, 2.5]
+    ... ])
+    >>> boxes_detection=np.array([
+    ...     [0., 0., 1., 1.],
+    ...     [2., 2., 2.5, 2.5]
+    ... ])
+    >>> iou = box_iou_batch(boxes_true=boxes_true, boxes_detection=boxes_detection)
+
+    >>> iou
+    np.array([[1., 0.], [0., 1.]])
+    ```
     """
+
+    _validate_boxes_batch(boxes_batch=boxes_true)
+    _validate_boxes_batch(boxes_batch=boxes_detection)
 
     def box_area(box):
         return (box[2] - box[0]) * (box[3] - box[1])
@@ -60,8 +98,8 @@ def box_iou_batch(boxes_true: np.ndarray, boxes_detection: np.ndarray) -> np.nda
     area_true = box_area(boxes_true.T)
     area_detection = box_area(boxes_detection.T)
 
-    top_left = np.maximum(boxes_true[:, None, :2], boxes_true[:, :2])
-    bottom_right = np.minimum(boxes_detection[:, None, 2:], boxes_detection[:, 2:])
+    top_left = np.maximum(boxes_true[:, None, :2], boxes_detection[:, :2])
+    bottom_right = np.minimum(boxes_true[:, None, 2:], boxes_detection[:, 2:])
 
     area_inter = np.prod(np.clip(bottom_right - top_left, a_min=0, a_max=None), 2)
     return area_inter / (area_true[:, None] + area_detection - area_inter)
@@ -77,7 +115,23 @@ def mask_iou(mask_true: np.ndarray, mask_detection: np.ndarray) -> Optional[floa
         mask_detection: 2d `np.ndarray` representing detection mask.
 
     Returns:
-        iou: `float` value between 0 and 1. None if union is equal to 0.
+        iou: `float` value between 0 and 1. `None` if union is equal to 0.
+
+    Example:
+    ```
+    >>> import numpy as np
+
+    >>> from onemetric.utils import mask_iou
+
+    >>> full_mask = np.ones((10, 10)).astype('uint8')
+    >>> quarter_mask = np.zeros((10, 10)).astype('uint8')
+    >>> quarter_mask[0:5, 0:5] = 1
+
+    >>> iou = mask_iou(mask_true=full_mask, mask_detection=quarter_mask)
+
+    >>> iou
+    0.25
+    ```
     """
     _validate_mask(mask=mask_true)
     _validate_mask(mask=mask_detection)
@@ -99,6 +153,13 @@ def _validate_box(box: Tuple[float, float, float, float]):
         raise ValueError(
             f"Bounding box must be defined as four elements tuple: (x_min, y_min, x_max, y_max), "
             f"where x_min < x_max and y_min < y_max. {box} given."
+        )
+
+
+def _validate_boxes_batch(boxes_batch: np.ndarray):
+    if type(boxes_batch) != np.ndarray or len(boxes_batch.shape) != 2 or boxes_batch.shape[1] != 4:
+        raise ValueError(
+            f"Bounding boxes batch must be defined as 2d np.array with (N, 4) shape, {boxes_batch} given"
         )
 
 

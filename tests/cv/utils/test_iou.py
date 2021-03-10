@@ -1,15 +1,14 @@
+from contextlib import ExitStack as DoesNotRaise
 from typing import Tuple, Optional
 
+import numpy as np
 import pytest
-from contextlib import ExitStack as DoesNotRaise
 
 from onemetric.cv.utils import box_iou, mask_iou, box_iou_batch
 
-import numpy as np
-
 
 @pytest.mark.parametrize(
-    "box_true, box_detection, expected_result, exc",
+    "box_true, box_detection, expected_result, exception",
     [
         (None, None, None, pytest.raises(ValueError)),
         ((0., 0., 1.), (0., 0., 1., 1.), None, pytest.raises(ValueError)),
@@ -32,16 +31,32 @@ def test_box_iou(
     box_true: Tuple[float, float, float, float],
     box_detection: Tuple[float, float, float, float],
     expected_result: Optional[float],
-    exc: Exception
+    exception: Exception
 ) -> None:
-    with exc:
+    with exception:
         result = box_iou(box_true=box_true, box_detection=box_detection)
         assert result == expected_result
 
 
 @pytest.mark.parametrize(
-    "boxes_true, boxes_detection, expected_result, exc",
+    "boxes_true, boxes_detection, expected_result, exception",
     [
+        (
+            None,
+            np.array([
+                [0., 0.25, 1., 1.25]
+            ]),
+            None,
+            pytest.raises(ValueError)
+        ),
+        (
+            np.array([
+                [0., 0.25, 1., 1.25]
+            ]),
+            None,
+            None,
+            pytest.raises(ValueError)
+        ),
         (
             np.array([
                 [0., 0., 1., 1.],
@@ -56,6 +71,20 @@ def test_box_iou(
                 [0., 1.]
             ]),
             DoesNotRaise()
+        ),
+        (
+            np.array([
+                [0., 0., 1., 1.],
+                [0., 0.75, 1., 1.75]
+            ]),
+            np.array([
+                [0., 0.25, 1., 1.25]
+            ]),
+            np.array([
+                [0.6],
+                [1/3]
+            ]),
+            DoesNotRaise()
         )
     ]
 )
@@ -63,11 +92,10 @@ def test_box_iou_batch(
     boxes_true: np.ndarray,
     boxes_detection: np.ndarray,
     expected_result: Optional[float],
-    exc: Exception
+    exception: Exception
 ) -> None:
-    with exc:
+    with exception:
         result = box_iou_batch(boxes_true=boxes_true, boxes_detection=boxes_detection)
-        print(result)
         np.testing.assert_array_equal(result, expected_result)
 
 
@@ -76,7 +104,7 @@ QUARTER_MASK[0:5, 0:5] = 1
 
 
 @pytest.mark.parametrize(
-    "mask_true, mask_detection, expected_result, exc",
+    "mask_true, mask_detection, expected_result, exception",
     [
         (None, None, None, pytest.raises(ValueError)),
         (np.zeros((10, 10)).astype('uint8'), np.zeros((20, 20)).astype('uint8'), None, pytest.raises(ValueError)),
@@ -90,7 +118,7 @@ QUARTER_MASK[0:5, 0:5] = 1
         (np.ones((10, 10)).astype('uint8'), QUARTER_MASK, 0.25, DoesNotRaise())
     ]
 )
-def test_mask_iou(mask_true: np.array, mask_detection: np.array, expected_result: float, exc: Exception) -> None:
-    with exc:
+def test_mask_iou(mask_true: np.array, mask_detection: np.array, expected_result: float, exception: Exception) -> None:
+    with exception:
         result = mask_iou(mask_true=mask_true, mask_detection=mask_detection)
         assert result == expected_result

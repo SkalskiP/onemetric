@@ -2,11 +2,12 @@ import numpy as np
 
 from onemetric.cv.utils import box_iou_batch
 
+# Updated version of ConfusionMatrix from https://github.com/kaanakan/object_detection_confusion_matrix
+
 
 class ConfusionMatrix:
     """
-    Calculate and visualize confusion matrix of Object Detection model. Updated version of
-    https://github.com/kaanakan/object_detection_confusion_matrix
+    Calculate and visualize confusion matrix of Object Detection model.
     """
     def __init__(self, num_classes: int, conf_threshold: float = 0.3, iou_threshold: float = 0.5) -> None:
         """
@@ -14,8 +15,7 @@ class ConfusionMatrix:
 
         Args:
             num_classes: `int` number of classes detected by model.
-            conf_threshold: `float` detection confidence threshold between 0 and 1. Detections with lower confidence will
-            be excluded.
+            conf_threshold: `float` detection confidence threshold between 0 and 1. Detections with lower confidence will be excluded.
             iou_threshold: `float` detection iou  threshold between 0 and 1. Detections with lower iou will be excluded.
         """
         self.__matrix = np.zeros((num_classes, num_classes))
@@ -25,13 +25,11 @@ class ConfusionMatrix:
 
     def submit_batch(self, objects_true: np.ndarray, objects_detection: np.ndarray) -> None:
         """
-        Update ConfusionMatrix instance with next batch of detections. This method should be triggered fo each image.
+        Update ConfusionMatrix instance with next batch of detections. This method should be triggered fo each image separately.
 
         Args:
-            objects_true: 2d `np.ndarray` representing ground-truth objects. `shape = (N, 6)` where N is number of
-            objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class, conf)`.
-            objects_detection: `2d np.ndarray` representing detected objects. `shape = (M, 5)` where M is number of
-            objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class)`.
+            objects_true: 2d `np.ndarray` representing ground-truth objects. `shape = (N, 6)` where `N` is number of objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class, conf)`.
+            objects_detection: `2d np.ndarray` representing detected objects. `shape = (M, 5)` where `M` is number of objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class)`.
         """
         objects_detection = objects_detection[objects_detection[:, 4] > self.__conf_threshold]
 
@@ -58,3 +56,10 @@ class ConfusionMatrix:
 
     def visualize(self) -> None:
         pass
+
+
+class MeanAveragePrecision:
+    """
+    Calculate and visualize mean average precision (mAP) of Object Detection model.
+    """
+    pass
