@@ -7,7 +7,7 @@
 <h1 align="center">onemetric</h1>
 
 <p align="center"> 
-    <img width="150" src="./docs/img/favicon.png" alt="Logo">
+    <img width="150" src="https://onemetric-images.s3.eu-central-1.amazonaws.com/favicon.png" alt="Logo">
 </p>
 
 ## Installation
