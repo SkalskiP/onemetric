@@ -221,5 +221,4 @@ def test_confusion_matrix_submit_batch(
         confusion_matrix = ConfusionMatrix(num_classes=num_classes)
         for true_batch, detection_batch in zip(true_batches, detection_batches):
             confusion_matrix.submit_batch(true_batch=true_batch, detection_batch=detection_batch)
-        # confusion_matrix.plot('/Users/piotrskalski/Downloads/onemetric_test/matrix.png', ['a', 'b', 'c'])
         np.testing.assert_array_equal(confusion_matrix.matrix, expected_result)

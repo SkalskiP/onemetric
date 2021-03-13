@@ -38,7 +38,7 @@ class ConfusionMatrix:
         Property, aggregated confusion matrix.
 
         Returns:
-            confusion_matrix: 2d `np.ndarray` raw confusion matrix. `shape = (num_classes + 1, num_classes + 1)` where additional row and column represents background class.
+            confusion_matrix: 2d `np.ndarray` raw confusion matrix. `shape = (num_classes + 1, num_classes + 1)` where additional row and column represent background class, FP and FN respectively.
         """
         return self._matrix
 
@@ -54,28 +54,30 @@ class ConfusionMatrix:
         self._validate_detection_batch(detection_batch=detection_batch)
         self._matrix += self._process_batch(true_batch=true_batch, detection_batch=detection_batch)
 
-    def plot(self, target_path: str, class_names: Optional[List[str]] = None) -> None:
+    def plot(self, target_path: str, title: Optional[str] = None, class_names: Optional[List[str]] = None) -> None:
         """
         Create a plot of confusion matrix and save it at selected location.
 
         Args:
             target_path: `str` selected target location of confusion matrix plot.
-            class_names: `Optional[List[str]` list of class names detected my model. If non given class indexes will be used.
-        :return:
+            title: `Optional[str]` title displayed at the top of the confusion matrix plot. Default `None`.
+            class_names: `Optional[List[str]` list of class names detected my model. If non given class indexes will be used. Default `None`.
         """
-        # array = self.matrix / (self.matrix.sum(0).reshape(1, self._num_classes + 1) + 1E-6)  # normalize
-        # array[array < 0.005] = np.nan  # don't annotate (would appear as 0.00)
-
-        array = self.matrix
+        array = self.matrix.copy()
 
         fig = plt.figure(figsize=(12, 9), tight_layout=True)
-        sn.set(font_scale=1.0 if self._num_classes < 50 else 0.8)  # for label size
-        labels = class_names is not None and (0 < len(class_names) < 99) and len(class_names) == self._num_classes  # apply names to ticklabels
-        sn.heatmap(array, annot=self._num_classes < 30, annot_kws={"size": 8}, cmap='Blues', fmt='.2f', square=True,
-                   xticklabels=class_names + ['background FN'] if labels else "auto",
-                   yticklabels=class_names + ['background FP'] if labels else "auto").set_facecolor((1, 1, 1))
-        fig.axes[0].set_xlabel('Predicted')
-        fig.axes[0].set_ylabel('True')
+        sn.set(font_scale=1.0 if self._num_classes < 50 else 0.8)
+
+        labels = class_names is not None and (0 < len(class_names) < 99) and len(class_names) == self._num_classes
+        x_tick_labels = class_names + ['FN'] if labels else "auto"
+        y_tick_labels = class_names + ['FP'] if labels else "auto"
+        sn.heatmap(array, annot=self._num_classes < 30, annot_kws={"size": 8}, fmt='.2f', square=True, vmin=0,
+                   cmap='Blues', xticklabels=x_tick_labels, yticklabels=y_tick_labels).set_facecolor((1, 1, 1))
+
+        if title:
+            fig.axes[0].set_title(title)
+        fig.axes[0].set_xlabel('Predicted label')
+        fig.axes[0].set_ylabel('True label')
         fig.savefig(target_path, dpi=250)
 
     def _process_batch(self, true_batch: np.ndarray, detection_batch: np.ndarray) -> np.ndarray:
