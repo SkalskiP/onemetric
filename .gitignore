@@ -10,6 +10,6 @@ site/
 env/
 venv/
 
-docs/
-!docs/img/*
+docs/*
+!docs/img/
 !docs/index.md

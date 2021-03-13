@@ -16,4 +16,5 @@ jobs:
       - run: python tools/autogen.py
       - run: cp README.md docs/index.md
       - run: cp LICENSE.md docs/LICENSE.md
+      - run: cp CONTRIBUTING.md docs/CONTRIBUTING.md
       - run: mkdocs gh-deploy --force
