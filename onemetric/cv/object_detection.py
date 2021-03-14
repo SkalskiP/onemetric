@@ -4,7 +4,7 @@ import numpy as np
 import seaborn as sn
 import matplotlib.pyplot as plt
 
-from onemetric.cv.utils import box_iou_batch
+from onemetric.cv.iou import box_iou_batch
 
 # Updated version of ConfusionMatrix from https://github.com/kaanakan/object_detection_confusion_matrix
 
@@ -32,6 +32,18 @@ class ConfusionMatrix:
         self._conf_threshold = conf_threshold
         self._iou_threshold = iou_threshold
 
+    def submit_batch(self, true_batch: np.ndarray, detection_batch: np.ndarray) -> None:
+        """
+        Update aggregated confusion matrix with next batch of detections. **This method should be triggered for each image separately.**
+
+        Args:
+            true_batch: 2d `np.ndarray` representing ground-truth objects. `shape = (N, 5)` where `N` is number of annotated objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class)`.
+            detection_batch: `2d np.ndarray` representing detected objects. `shape = (M, 6)` where `M` is number of detected objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class, conf)`.
+        """
+        _validate_true_batch(true_batch=true_batch)
+        _validate_detection_batch(detection_batch=detection_batch)
+        self._matrix += self._process_batch(true_batch=true_batch, detection_batch=detection_batch)
+
     @property
     def matrix(self) -> np.ndarray:
         """
@@ -41,18 +53,6 @@ class ConfusionMatrix:
             confusion_matrix: 2d `np.ndarray` raw confusion matrix. `shape = (num_classes + 1, num_classes + 1)` where additional row and column represent background class, FP and FN respectively.
         """
         return self._matrix
-
-    def submit_batch(self, true_batch: np.ndarray, detection_batch: np.ndarray) -> None:
-        """
-        Update aggregated confusion matrix with next batch of detections. **This method should be triggered for each image separately.**
-
-        Args:
-            true_batch: 2d `np.ndarray` representing ground-truth objects. `shape = (N, 5)` where `N` is number of annotated objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class)`.
-            detection_batch: `2d np.ndarray` representing detected objects. `shape = (M, 6)` where `M` is number of detected objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class, conf)`.
-        """
-        self._validate_true_batch(true_batch=true_batch)
-        self._validate_detection_batch(detection_batch=detection_batch)
-        self._matrix += self._process_batch(true_batch=true_batch, detection_batch=detection_batch)
 
     def plot(self, target_path: str, title: Optional[str] = None, class_names: Optional[List[str]] = None) -> None:
         """
@@ -123,21 +123,6 @@ class ConfusionMatrix:
             matches = matches[np.unique(matches[:, 0], return_index=True)[1]]
         return matches
 
-    def _validate_true_batch(self, true_batch: np.ndarray):
-        if type(true_batch) != np.ndarray or len(true_batch.shape) != 2 or true_batch.shape[1] != 5:
-            raise ValueError(
-                f"True batch must be defined as 2d np.array with (N, 5) shape, where N is number of is number of "
-                f"annotated objects and each row is in (x_min, y_min, x_max, y_max, class) format. {true_batch} given."
-            )
-
-    def _validate_detection_batch(self, detection_batch: np.ndarray):
-        if type(detection_batch) != np.ndarray or len(detection_batch.shape) != 2 or detection_batch.shape[1] != 6:
-            raise ValueError(
-                f"Detected batch must be defined as 2d np.array with (M, 6) shape, where M is number of is number of "
-                f"detected objects and each row is in (x_min, y_min, x_max, y_max, class, conf) format. "
-                f"{detection_batch} given."
-            )
-
     def _validate_classes_idx_values(self, classes: np.ndarray):
         if classes.size > 0 and (classes.min() < 0 or classes.max() > self._num_classes - 1):
             raise ValueError(
@@ -147,6 +132,42 @@ class ConfusionMatrix:
 
 class MeanAveragePrecision:
     """
-    To be added soon. Calculate and visualize mean average precision (mAP) of Object Detection model.
+    Calculate and visualize mean average precision (mAP) of Object Detection model.
     """
-    pass
+
+    def __init__(self, num_classes: int, iou_thresholds: Optional[List[float]] = None) -> None:
+        if iou_thresholds is None:
+            self._iou_thresholds = [0.5]
+        self._num_classes = num_classes
+
+    def submit_batch(self, true_batch: np.ndarray, detection_batch: np.ndarray) -> None:
+        """
+        Args:
+            true_batch: 2d `np.ndarray` representing ground-truth objects. `shape = (N, 5)` where `N` is number of annotated objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class)`.
+            detection_batch: `2d np.ndarray` representing detected objects. `shape = (M, 6)` where `M` is number of detected objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class, conf)`.
+        """
+        _validate_true_batch(true_batch=true_batch)
+        _validate_detection_batch(detection_batch=detection_batch)
+
+    def calculate(self) -> None:
+        pass
+
+    def _process_batch(self, true_batch: np.ndarray, detection_batch: np.ndarray) -> np.ndarray:
+        pass
+
+
+def _validate_true_batch(true_batch: np.ndarray):
+    if type(true_batch) != np.ndarray or len(true_batch.shape) != 2 or true_batch.shape[1] != 5:
+        raise ValueError(
+            f"True batch must be defined as 2d np.array with (N, 5) shape, where N is number of is number of "
+            f"annotated objects and each row is in (x_min, y_min, x_max, y_max, class) format. {true_batch} given."
+        )
+
+
+def _validate_detection_batch(detection_batch: np.ndarray):
+    if type(detection_batch) != np.ndarray or len(detection_batch.shape) != 2 or detection_batch.shape[1] != 6:
+        raise ValueError(
+            f"Detected batch must be defined as 2d np.array with (M, 6) shape, where M is number of is number of "
+            f"detected objects and each row is in (x_min, y_min, x_max, y_max, class, conf) format. "
+            f"{detection_batch} given."
+        )
