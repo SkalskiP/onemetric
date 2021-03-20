@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 
 import numpy as np
 
@@ -8,6 +8,7 @@ from onemetric.const import EPSILON
 
 
 # Updated version of compute_ap from https://github.com/ultralytics/yolov3
+from onemetric.cv.utils.iou import box_iou_batch
 
 
 @dataclass(frozen=True)
@@ -21,15 +22,21 @@ class AveragePrecision:
     iou_threshold: Optional[float] = None
 
     @classmethod
-    def from_detections(cls, true_batches: np.ndarray, detection_batches: np.ndarray, class_idx: int, iou_threshold: float = 0.5) -> AveragePrecision:
+    def from_detections(cls, true_batches: List[np.ndarray], detection_batches: List[np.ndarray], class_idx: int, iou_threshold: float = 0.5) -> AveragePrecision:
         """
-        Calculate average precision (AP) metric based on ground-true and detected objects.
+        Calculate average precision (AP) metric based on ground-true and detected objects across all images in concerned dataset.
 
         Args:
-            true_batches: 3d `np.ndarray` representing ground-truth objects. `shape = (I, N, 5)` where `I` is number of images and `N` is number of ground-truth objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class)`.
-            detection_batches: `3d np.ndarray` representing detected objects. `shape = (I, M, 6)` where `I` is number of images and `M` is number of detected objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class, conf)`.
+            true_batches: `List[np.ndarray]` representing ground-truth objects across all images in concerned dataset. Each element of `true_batches` list describe single image and has `shape = (N, 5)` where `N` is number of ground-truth objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class)`.
+            detection_batches: `List[np.ndarray]` representing detected objects across all images in concerned dataset. Each element of `detection_batches` list describe single image and has `shape = (M, 6)` where `M` is number of detected objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class, conf)`.
+            class_idx: `int` index of the class for which you want to calculate average precision (AP).
+            iou_threshold: `float` detection iou  threshold between 0 and 1. Detections with lower iou will be classified as FP.
         """
-        pass
+        x = [
+            AveragePrecision._process_batch(true_batch=true_batch, detection_batch=detection_batch)
+            for true_batch, detection_batch
+            in zip(true_batches, detection_batches)
+        ]
 
     @classmethod
     def from_precision_recall(cls, recall: np.ndarray, precision: np.ndarray, class_idx: Optional[int] = None, iou_threshold: Optional[float] = None) -> AveragePrecision:
@@ -55,5 +62,40 @@ class AveragePrecision:
         pass
 
     @staticmethod
-    def _process_batch(true_batch: np.ndarray, detection_batches: np.ndarray, class_idx: int, iou_threshold: float = 0.5) -> np.ndarray:
-        pass
+    def _process_batch(true_batch: np.ndarray, detection_batch: np.ndarray, class_idx: int, iou_threshold: float = 0.5) -> np.ndarray:
+        true_batch_filtered = true_batch[true_batch[:, 4] == class_idx]
+        detection_batch_filtered = detection_batch[detection_batch[:, 4] == class_idx]
+
+        # confidence, tp, fp
+        result_matrix = np.zeros((detection_batch_filtered.shape[0], 3))
+
+        true_boxes = true_batch_filtered[:, :4]
+        detection_boxes = detection_batch_filtered[:, :4]
+        detection_conf = detection_batch_filtered[:, 5]
+        iou_batch = box_iou_batch(boxes_true=true_boxes, boxes_detection=detection_boxes)
+        matched_idx = np.asarray(iou_batch > iou_threshold).nonzero()
+
+        if matched_idx[0].shape[0]:
+            matches = np.stack((matched_idx[0], matched_idx[1], iou_batch[matched_idx]), axis=1)
+            matches = AveragePrecision._drop_extra_matches(matches=matches)
+        else:
+            matches = np.zeros((0, 3))
+
+        matched_true_class_idx, matched_detection_class_idx, _ = matches.transpose().astype(np.int16)
+
+        for i, conf in enumerate(detection_conf):
+            if any(matched_detection_class_idx == i):
+                result_matrix[i] = np.array([conf, 1, 0])
+            else:
+                result_matrix[i] = np.array([conf, 0, 1])
+
+        return result_matrix
+
+    @staticmethod
+    def _drop_extra_matches(matches: np.ndarray) -> np.ndarray:
+        if matches.shape[0] > 0:
+            matches = matches[matches[:, 2].argsort()[::-1]]
+            matches = matches[np.unique(matches[:, 1], return_index=True)[1]]
+            matches = matches[matches[:, 2].argsort()[::-1]]
+            matches = matches[np.unique(matches[:, 0], return_index=True)[1]]
+        return matches

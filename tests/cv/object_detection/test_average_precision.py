@@ -65,3 +65,43 @@ def test_from_precision_recall(
         assert math.isclose(result.value, expected_result.value)
         np.testing.assert_array_equal(result.recall_values, expected_result.recall_values)
         np.testing.assert_array_equal(result.precision_values, expected_result.precision_values)
+
+
+@pytest.mark.parametrize(
+    "true_batch, detection_batch, class_idx, iou_threshold, expected_result, exception",
+    [
+        (
+            np.array([
+                [0.0, 0.0, 3.0, 3.0, 1],
+                [2.0, 2.0, 5.0, 5.0, 1],
+                [6.0, 1.0, 8.0, 3.0, 2],
+            ]),
+            np.array([
+                [0.0, 0.0, 3.0, 3.0, 1, 0.9],
+                [0.1, 0.1, 3.0, 3.0, 0, 0.9],
+                [6.0, 1.0, 8.0, 3.0, 1, 0.8],
+                [1.0, 6.0, 2.0, 7.0, 1, 0.8],
+            ]),
+            1,
+            0.5,
+            np.array([
+                [0.9, 1, 0],
+                [0.8, 0, 1],
+                [0.8, 0, 1],
+            ]),
+            DoesNotRaise()
+        )
+    ]
+)
+def test_process_batch(
+    true_batch: np.ndarray,
+    detection_batch: np.ndarray,
+    class_idx: int,
+    iou_threshold: float,
+    expected_result: Optional[np.ndarray],
+    exception: Exception
+) -> None:
+    with exception:
+        result = AveragePrecision._process_batch(true_batch=true_batch, detection_batch=detection_batch, class_idx=class_idx, iou_threshold=iou_threshold)
+        print(result)
+        np.testing.assert_array_equal(result, expected_result)

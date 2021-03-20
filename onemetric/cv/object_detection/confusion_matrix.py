@@ -59,7 +59,7 @@ class ConfusionMatrix:
         Args:
             target_path: `str` selected target location of confusion matrix plot.
             title: `Optional[str]` title displayed at the top of the confusion matrix plot. Default `None`.
-            class_names: `Optional[List[str]` list of class names detected my model. If non given class indexes will be used. Default `None`.
+            class_names: `Optional[List[str]]` list of class names detected my model. If non given class indexes will be used. Default `None`.
         """
         array = self.matrix.copy()
 
