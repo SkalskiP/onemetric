@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [ 3.6, 3.7, 3.8, 3.9 ]
+        python-version: [ 3.7, 3.8, 3.9 ]
         os: [windows-latest, macos-latest, ubuntu-latest]
 
     steps:
@@ -38,7 +38,7 @@ jobs:
       run: |
         pytest --cov=onemetric --cov-report xml:coverage.xml
     - name: Codecov
-      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.6'}}
+      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.7'}}
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}

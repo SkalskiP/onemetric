@@ -1,3 +1,4 @@
+from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
@@ -20,7 +21,7 @@ class AveragePrecision:
     iou_threshold: Optional[float] = None
 
     @classmethod
-    def from_detections(cls, true_batches: np.ndarray, detection_batches: np.ndarray, class_idx: int, iou_threshold: float = 0.5) -> 'AveragePrecision':
+    def from_detections(cls, true_batches: np.ndarray, detection_batches: np.ndarray, class_idx: int, iou_threshold: float = 0.5) -> AveragePrecision:
         """
         Calculate average precision (AP) metric based on ground-true and detected objects.
 
@@ -31,7 +32,7 @@ class AveragePrecision:
         pass
 
     @classmethod
-    def from_precision_recall(cls, recall: np.ndarray, precision: np.ndarray, class_idx: Optional[int] = None, iou_threshold: Optional[float] = None) -> 'AveragePrecision':
+    def from_precision_recall(cls, recall: np.ndarray, precision: np.ndarray, class_idx: Optional[int] = None, iou_threshold: Optional[float] = None) -> AveragePrecision:
         """
         Calculate average precision (AP) metric based on given precision recall curve.
         """
