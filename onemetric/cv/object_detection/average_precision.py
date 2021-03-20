@@ -33,7 +33,7 @@ class AveragePrecision:
             iou_threshold: `float` detection iou  threshold between 0 and 1. Detections with lower iou will be classified as FP.
         """
         x = [
-            AveragePrecision._process_batch(true_batch=true_batch, detection_batch=detection_batch)
+            AveragePrecision._evaluate_detection_batch(true_batch=true_batch, detection_batch=detection_batch)
             for true_batch, detection_batch
             in zip(true_batches, detection_batches)
         ]
@@ -41,7 +41,7 @@ class AveragePrecision:
     @classmethod
     def from_precision_recall(cls, recall: np.ndarray, precision: np.ndarray, class_idx: Optional[int] = None, iou_threshold: Optional[float] = None) -> AveragePrecision:
         """
-        Calculate average precision (AP) metric based on given precision recall curve.
+        Calculate average precision (AP) metric based on given precision/recall curve.
         """
         recall_values = np.concatenate(([0.], recall, [recall[-1] + EPSILON]))
         precision_values = np.concatenate(([1.], precision, [0.]))
@@ -56,13 +56,16 @@ class AveragePrecision:
             iou_threshold=iou_threshold
         )
 
-    def plot(self) -> None:
-        """
-        """
-        pass
-
     @staticmethod
-    def _process_batch(true_batch: np.ndarray, detection_batch: np.ndarray, class_idx: int, iou_threshold: float = 0.5) -> np.ndarray:
+    def _evaluate_detection_batch(true_batch: np.ndarray, detection_batch: np.ndarray, class_idx: int, iou_threshold: float = 0.5) -> np.ndarray:
+        """
+        Calculates the intermediate `evaluation_matrix` needed to obtain the precision/recall curve.
+        Returns:
+            evaluation_matrix: 2d `np.ndarray` matrix describing which of the obtained detections is TP and which is FP. `shape = (R, 3)` where `R` is number of detected objects.
+        """
+        _validate_true_batch(true_batch=true_batch)
+        _validate_detection_batch(detection_batch=detection_batch)
+
         true_batch_filtered = true_batch[true_batch[:, 4] == class_idx]
         detection_batch_filtered = detection_batch[detection_batch[:, 4] == class_idx]
 
@@ -99,3 +102,20 @@ class AveragePrecision:
             matches = matches[matches[:, 2].argsort()[::-1]]
             matches = matches[np.unique(matches[:, 0], return_index=True)[1]]
         return matches
+
+
+def _validate_true_batch(true_batch: np.ndarray):
+    if type(true_batch) != np.ndarray or len(true_batch.shape) != 2 or true_batch.shape[1] != 5:
+        raise ValueError(
+            f"True batch must be defined as 2d np.array with (N, 5) shape, where N is number of is number of "
+            f"annotated objects and each row is in (x_min, y_min, x_max, y_max, class) format. {true_batch} given."
+        )
+
+
+def _validate_detection_batch(detection_batch: np.ndarray):
+    if type(detection_batch) != np.ndarray or len(detection_batch.shape) != 2 or detection_batch.shape[1] != 6:
+        raise ValueError(
+            f"Detected batch must be defined as 2d np.array with (M, 6) shape, where M is number of is number of "
+            f"detected objects and each row is in (x_min, y_min, x_max, y_max, class, conf) format. "
+            f"{detection_batch} given."
+        )

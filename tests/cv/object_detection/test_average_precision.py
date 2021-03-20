@@ -72,6 +72,84 @@ def test_from_precision_recall(
     [
         (
             np.array([
+                [0.0, 0.0, 1.0, 1.0, 1],
+            ]),
+            np.zeros((0, 6)),
+            1,
+            0.5,
+            np.zeros((0, 3)),
+            DoesNotRaise()
+        ),  # FN; object undetected
+        (
+            np.zeros((0, 5)),
+            np.array([
+                [0.0, 0.0, 1.0, 1.0, 1, 0.9],
+            ]),
+            1,
+            0.5,
+            np.array([
+                [0.9, 0, 1],
+            ]),
+            DoesNotRaise()
+        ),  # FP object detected; object belongs to selected class
+        (
+            np.array([
+                [0.0, 0.0, 1.0, 1.0, 1],
+            ]),
+            np.array([
+                [0.0, 0.0, 1.0, 1.0, 1, 0.9],
+            ]),
+            1,
+            0.5,
+            np.array([
+                [0.9, 1, 0],
+            ]),
+            DoesNotRaise()
+        ),  # TP object detected; object belongs to selected class
+        (
+            np.array([
+                [0.0, 0.0, 1.0, 1.0, 1],
+            ]),
+            np.array([
+                [0.0, 0.0, 1.0, 1.0, 1, 0.9],
+            ]),
+            2,
+            0.5,
+            np.zeros((0, 3)),
+            DoesNotRaise()
+        ),  # TP object detected; object does not belong to selected class
+        (
+            np.array([
+                [0.0, 0.0, 1.0, 1.0, 1],
+            ]),
+            np.array([
+                [0.0, 0.0, 1.0, 1.0, 1, 0.9],
+                [0.1, 0.1, 1.1, 1.1, 1, 0.8],
+            ]),
+            1,
+            0.5,
+            np.array([
+                [0.9, 1, 0],
+                [0.8, 0, 1],
+            ]),
+            DoesNotRaise()
+        ),  # Multiple detections of the same class
+        (
+            np.array([
+                [0.0, 0.0, 1.0, 1.0, 1],
+            ]),
+            np.array([
+                [0.5, 0.5, 1.5, 1.5, 1, 0.9],
+            ]),
+            1,
+            0.5,
+            np.array([
+                [0.9, 0, 1],
+            ]),
+            DoesNotRaise()
+        ),  # FP; IoU lower than threshold
+        (
+            np.array([
                 [0.0, 0.0, 3.0, 3.0, 1],
                 [2.0, 2.0, 5.0, 5.0, 1],
                 [6.0, 1.0, 8.0, 3.0, 2],
@@ -90,10 +168,10 @@ def test_from_precision_recall(
                 [0.8, 0, 1],
             ]),
             DoesNotRaise()
-        )
+        ),  # General use case
     ]
 )
-def test_process_batch(
+def test_evaluate_detection_batch(
     true_batch: np.ndarray,
     detection_batch: np.ndarray,
     class_idx: int,
@@ -102,6 +180,10 @@ def test_process_batch(
     exception: Exception
 ) -> None:
     with exception:
-        result = AveragePrecision._process_batch(true_batch=true_batch, detection_batch=detection_batch, class_idx=class_idx, iou_threshold=iou_threshold)
-        print(result)
+        result = AveragePrecision._evaluate_detection_batch(
+            true_batch=true_batch,
+            detection_batch=detection_batch,
+            class_idx=class_idx,
+            iou_threshold=iou_threshold
+        )
         np.testing.assert_array_equal(result, expected_result)
