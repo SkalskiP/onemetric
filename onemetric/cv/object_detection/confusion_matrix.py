@@ -4,9 +4,7 @@ import numpy as np
 import seaborn as sn
 import matplotlib.pyplot as plt
 
-from onemetric.cv.iou import box_iou_batch
-
-# Updated version of ConfusionMatrix from https://github.com/kaanakan/object_detection_confusion_matrix
+from onemetric.cv.utils.iou import box_iou_batch
 
 
 class ConfusionMatrix:
@@ -128,32 +126,6 @@ class ConfusionMatrix:
             raise ValueError(
                 f"Class index values must be between 0 and ${self._num_classes - 1}. {classes} given."
             )
-
-
-class MeanAveragePrecision:
-    """
-    Calculate and visualize mean average precision (mAP) of Object Detection model.
-    """
-
-    def __init__(self, num_classes: int, iou_thresholds: Optional[List[float]] = None) -> None:
-        if iou_thresholds is None:
-            self._iou_thresholds = [0.5]
-        self._num_classes = num_classes
-
-    def submit_batch(self, true_batch: np.ndarray, detection_batch: np.ndarray) -> None:
-        """
-        Args:
-            true_batch: 2d `np.ndarray` representing ground-truth objects. `shape = (N, 5)` where `N` is number of annotated objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class)`.
-            detection_batch: `2d np.ndarray` representing detected objects. `shape = (M, 6)` where `M` is number of detected objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class, conf)`.
-        """
-        _validate_true_batch(true_batch=true_batch)
-        _validate_detection_batch(detection_batch=detection_batch)
-
-    def calculate(self) -> None:
-        pass
-
-    def _process_batch(self, true_batch: np.ndarray, detection_batch: np.ndarray) -> np.ndarray:
-        pass
 
 
 def _validate_true_batch(true_batch: np.ndarray):

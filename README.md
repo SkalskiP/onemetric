@@ -3,6 +3,7 @@
 ![PyPI - License](https://img.shields.io/pypi/l/onemetric)
 [![codecov](https://codecov.io/gh/SkalskiP/onemetric/branch/master/graph/badge.svg?token=ZFSEYF9WN4)](https://codecov.io/gh/SkalskiP/onemetric)
 ![tests](https://github.com/SkalskiP/onemetric/actions/workflows/tests.yml/badge.svg)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/onemetric)
 
 <h1 align="center">onemetric</h1>
 

@@ -4,7 +4,7 @@ from typing import Tuple, Optional
 import numpy as np
 import pytest
 
-from onemetric.cv.iou import box_iou, mask_iou, box_iou_batch
+from onemetric.cv.utils.iou import box_iou, mask_iou, box_iou_batch
 
 
 @pytest.mark.parametrize(
