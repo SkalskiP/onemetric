@@ -1,5 +1,5 @@
 from contextlib import ExitStack as DoesNotRaise
-from typing import Optional
+from typing import Optional, List
 
 import numpy as np
 import pytest
@@ -13,12 +13,64 @@ from onemetric.cv.object_detection.average_precision import AveragePrecision
     "recall, precision, expected_result, exception",
     [
         (
+            np.array([0.0, 1.0]),
+            np.array([1.0]),
+            None,
+            pytest.raises(ValueError)
+        ),  # Precision and recall arrays have unequal length
+        (
+            np.array([0.0]),
+            np.array([1.0, 0.5]),
+            None,
+            pytest.raises(ValueError)
+        ),  # Precision and recall arrays have unequal length
+        (
+            np.array([]),
+            np.array([]),
+            AveragePrecision(
+                value=0.,
+                recall_values=np.array([0.0, EPSILON]),
+                precision_values=np.array([1.0, 0.0])
+            ),
+            DoesNotRaise()
+        ),  # Precision and recall arrays are of insufficient length
+        (
             np.array([0.0]),
             np.array([0.0]),
             AveragePrecision(
                 value=0.,
                 recall_values=np.array([0.0, 0.0, EPSILON]),
                 precision_values=np.array([1.0, 0.0, 0.0])
+            ),
+            DoesNotRaise()
+        ),
+        (
+            np.array([1.0]),
+            np.array([1.0]),
+            AveragePrecision(
+                value=1.,
+                recall_values=np.array([0.0, 1.0, 1.0 + EPSILON]),
+                precision_values=np.array([1.0, 1.0, 0.0])
+            ),
+            DoesNotRaise()
+        ),
+        (
+            np.array([0.0, 1.0]),
+            np.array([0.0, 0.5]),
+            AveragePrecision(
+                value=0.5,
+                recall_values=np.array([0.0, 0.0, 1.0, 1.0 + EPSILON]),
+                precision_values=np.array([1.0, 0.5, 0.5, 0.0])
+            ),
+            DoesNotRaise()
+        ),
+        (
+            np.array([0.5, 0.5]),
+            np.array([1.0, 0.5]),
+            AveragePrecision(
+                value=0.5,
+                recall_values=np.array([0.0, 0.5, 0.5, 0.5 + EPSILON]),
+                precision_values=np.array([1.0, 1.0, 0.5, 0.0])
             ),
             DoesNotRaise()
         ),
@@ -187,3 +239,114 @@ def test_evaluate_detection_batch(
             iou_threshold=iou_threshold
         )
         np.testing.assert_array_equal(result, expected_result)
+
+
+@pytest.mark.parametrize(
+    "true_batches, detection_batches, class_idx, iou_threshold, expected_result, exception",
+    [
+        (
+            np.array([]),
+            np.array([]),
+            1,
+            0.5,
+            None,
+            pytest.raises(ValueError)
+        ),  # Incorrect input data format
+        (
+            [
+                np.array([
+                    [0.0, 0.0, 1.0, 1.0, 1],
+                ]),
+            ],
+            [],
+            1,
+            0.5,
+            None,
+            pytest.raises(ValueError)
+        ),  # Unequal length of true_batches and detection_batches
+        (
+            [],
+            [
+                np.array([
+                    [0.0, 0.0, 1.0, 1.0, 1, 0.9],
+                ]),
+            ],
+            1,
+            0.5,
+            None,
+            pytest.raises(ValueError)
+        ),  # Unequal length of true_batches and detection_batches
+        (
+            [
+                np.array([
+                    [0.0, 0.0, 1.0, 1.0, 1, 0.9],
+                ]),
+            ],
+            [
+                np.array([
+                    [0.0, 0.0, 1.0, 1.0, 1],
+                ]),
+            ],
+            1,
+            0.5,
+            None,
+            pytest.raises(ValueError)
+        ),  # Incorrect batch shape
+        (
+            [
+                np.array([
+                    [0.0, 0.0, 1.0, 1.0, 1],
+                ]),
+            ],
+            [
+                np.zeros((0, 6)),
+            ],
+            1,
+            0.5,
+            AveragePrecision(
+                value=0.,
+                recall_values=np.array([0.0, EPSILON]),
+                precision_values=np.array([1.0, 0.0])
+            ),
+            DoesNotRaise()
+        ),  # Single image with no detections found
+        (
+            [
+                np.array([
+                    [0.0, 0.0, 1.0, 1.0, 1],
+                ]),
+            ],
+            [
+                np.array([
+                    [0.0, 0.0, 1.0, 1.0, 1, 0.9],
+                ]),
+            ],
+            1,
+            0.5,
+            AveragePrecision(
+                value=1.,
+                recall_values=np.array([0.0, 1.0, 1.0 + EPSILON]),
+                precision_values=np.array([1.0, 1.0, 0.0])
+            ),
+            DoesNotRaise()
+        ),  # Single image with single detection found
+    ]
+)
+def test_from_detections(
+    true_batches: List[np.ndarray],
+    detection_batches: List[np.ndarray],
+    class_idx: int,
+    iou_threshold: float,
+    expected_result: Optional[AveragePrecision],
+    exception: Exception
+) -> None:
+    with exception:
+        result = AveragePrecision.from_detections(
+            true_batches=true_batches,
+            detection_batches=detection_batches,
+            class_idx=class_idx,
+            iou_threshold=iou_threshold
+        )
+        assert math.isclose(result.value, expected_result.value)
+        np.testing.assert_array_equal(result.recall_values, expected_result.recall_values)
+        np.testing.assert_array_equal(result.precision_values, expected_result.precision_values)

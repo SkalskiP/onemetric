@@ -5,10 +5,10 @@ from typing import Optional, List
 import numpy as np
 
 from onemetric.const import EPSILON
+from onemetric.cv.utils.iou import box_iou_batch
 
 
 # Updated version of compute_ap from https://github.com/ultralytics/yolov3
-from onemetric.cv.utils.iou import box_iou_batch
 
 
 @dataclass(frozen=True)
@@ -32,23 +32,41 @@ class AveragePrecision:
             class_idx: `int` index of the class for which you want to calculate average precision (AP).
             iou_threshold: `float` detection iou  threshold between 0 and 1. Detections with lower iou will be classified as FP.
         """
-        x = [
-            AveragePrecision._evaluate_detection_batch(true_batch=true_batch, detection_batch=detection_batch)
+        AveragePrecision._validate_detections(true_batches=true_batches, detection_batches=detection_batches)
+        evaluated_detections = np.concatenate([
+            AveragePrecision._evaluate_detection_batch(
+                true_batch=true_batch,
+                detection_batch=detection_batch,
+                class_idx=class_idx,
+                iou_threshold=iou_threshold
+            )
             for true_batch, detection_batch
             in zip(true_batches, detection_batches)
-        ]
+        ])
+        evaluated_detections = evaluated_detections[evaluated_detections[:, 0].argsort()[::-1]]
+        tp = np.cumsum(evaluated_detections[:, 1])
+        all_detections = evaluated_detections.shape[0]
+        precision = tp / np.arange(1, all_detections + 1)
+        recall = tp / all_detections
+        return cls.from_precision_recall(precision=precision, recall=recall, class_idx=class_idx, iou_threshold=iou_threshold)
 
     @classmethod
     def from_precision_recall(cls, recall: np.ndarray, precision: np.ndarray, class_idx: Optional[int] = None, iou_threshold: Optional[float] = None) -> AveragePrecision:
         """
         Calculate average precision (AP) metric based on given precision/recall curve.
         """
-        recall_values = np.concatenate(([0.], recall, [recall[-1] + EPSILON]))
-        precision_values = np.concatenate(([1.], precision, [0.]))
+        AveragePrecision._validate_pr(precision=precision, recall=recall)
+        if precision.shape[0] == 0:
+            recall_values = np.array([0., EPSILON])
+            precision_values = np.array([1., 0.])
+        else:
+            recall_values = np.concatenate(([0.], recall, [recall[-1] + EPSILON]))
+            precision_values = np.concatenate(([1.], precision, [0.]))
+
         precision_values = np.flip(np.maximum.accumulate(np.flip(precision_values)))
         i = np.where(recall_values[1:] != recall_values[:-1])[0]
         value = np.sum((recall_values[i + 1] - recall_values[i]) * precision_values[i + 1])
-        return AveragePrecision(
+        return cls(
             value=value,
             recall_values=recall_values,
             precision_values=precision_values,
@@ -57,7 +75,7 @@ class AveragePrecision:
         )
 
     @staticmethod
-    def _evaluate_detection_batch(true_batch: np.ndarray, detection_batch: np.ndarray, class_idx: int, iou_threshold: float = 0.5) -> np.ndarray:
+    def _evaluate_detection_batch(true_batch: np.ndarray, detection_batch: np.ndarray, class_idx: int, iou_threshold: float) -> np.ndarray:
         """
         Calculates the intermediate `evaluation_matrix` needed to obtain the precision/recall curve.
         Returns:
@@ -102,6 +120,16 @@ class AveragePrecision:
             matches = matches[matches[:, 2].argsort()[::-1]]
             matches = matches[np.unique(matches[:, 0], return_index=True)[1]]
         return matches
+
+    @staticmethod
+    def _validate_detections(true_batches: List[np.ndarray], detection_batches: List[np.ndarray]):
+        if type(true_batches) != list or type(detection_batches) != list or len(true_batches) != len(detection_batches):
+            raise ValueError('true_batches and detection_batches must be lists and their lengths must be equal.')
+
+    @staticmethod
+    def _validate_pr(recall: np.ndarray, precision: np.ndarray):
+        if type(recall) != np.ndarray or type(precision) != np.ndarray or recall.shape != precision.shape:
+            raise ValueError("recall and precision must be 1d np.array with (N, ) shape.")
 
 
 def _validate_true_batch(true_batch: np.ndarray):
