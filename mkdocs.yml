@@ -27,6 +27,11 @@ repo_name: 'SkalskiP/onemetric'
 repo_url: 'https://github.com/SkalskiP/onemetric'
 
 
+google_analytics:
+  - 'UA-192741363-1'
+  - 'auto'
+
+
 markdown_extensions:
   - pymdownx.highlight
   - pymdownx.superfences

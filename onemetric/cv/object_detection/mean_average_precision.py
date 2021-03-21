@@ -1,44 +1,43 @@
-from typing import Optional, List, Tuple
+from __future__ import annotations
+from dataclasses import dataclass
+from typing import List
 
 import numpy as np
 
+from onemetric.cv.object_detection.average_precision import AveragePrecision
 
+
+@dataclass(frozen=True)
 class MeanAveragePrecision:
-    """
-    Calculate and visualize mean average precision (mAP) of Object Detection model.
-    """
+    value: float
+    per_class: List[AveragePrecision]
 
-    def __init__(self, num_classes: int, iou_thresholds: Optional[List[float]] = None) -> None:
-        if iou_thresholds is None:
-            self._iou_thresholds = [0.5]
-        self._num_classes = num_classes
-        self.__batches: List[Tuple[np.ndarray, np.ndarray]] = []
-
-    def submit_batch(self, true_batch: np.ndarray, detection_batch: np.ndarray) -> None:
+    @classmethod
+    def from_detections(
+        cls,
+        true_batches: List[np.ndarray],
+        detection_batches: List[np.ndarray],
+        num_classes: int,
+        iou_threshold: float = 0.5
+    ) -> MeanAveragePrecision:
         """
+        Calculate mean average precision (mAP) metric based on ground-true and detected objects across all images in concerned dataset.
+
         Args:
-            true_batch: 2d `np.ndarray` representing ground-truth objects. `shape = (N, 5)` where `N` is number of annotated objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class)`.
-            detection_batch: `2d np.ndarray` representing detected objects. `shape = (M, 6)` where `M` is number of detected objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class, conf)`.
+            true_batches: `List[np.ndarray]` representing ground-truth objects across all images in concerned dataset. Each element of `true_batches` list describe single image and has `shape = (N, 5)` where `N` is number of ground-truth objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class)`.
+            detection_batches: `List[np.ndarray]` representing detected objects across all images in concerned dataset. Each element of `detection_batches` list describe single image and has `shape = (M, 6)` where `M` is number of detected objects. Each row is expected to be in `(x_min, y_min, x_max, y_max, class, conf)`.
+            num_classes: `int` number of classes detected by model.
+            iou_threshold: `float` detection iou  threshold between 0 and 1. Detections with lower iou will be classified as FP.
         """
-        _validate_true_batch(true_batch=true_batch)
-        _validate_detection_batch(detection_batch=detection_batch)
-
-    def calculate(self) -> None:
-        pass
-
-
-def _validate_true_batch(true_batch: np.ndarray):
-    if type(true_batch) != np.ndarray or len(true_batch.shape) != 2 or true_batch.shape[1] != 5:
-        raise ValueError(
-            f"True batch must be defined as 2d np.array with (N, 5) shape, where N is number of is number of "
-            f"annotated objects and each row is in (x_min, y_min, x_max, y_max, class) format. {true_batch} given."
-        )
-
-
-def _validate_detection_batch(detection_batch: np.ndarray):
-    if type(detection_batch) != np.ndarray or len(detection_batch.shape) != 2 or detection_batch.shape[1] != 6:
-        raise ValueError(
-            f"Detected batch must be defined as 2d np.array with (M, 6) shape, where M is number of is number of "
-            f"detected objects and each row is in (x_min, y_min, x_max, y_max, class, conf) format. "
-            f"{detection_batch} given."
-        )
+        per_class = [
+            AveragePrecision.from_detections(
+                true_batches=true_batches,
+                detection_batches=detection_batches,
+                class_idx=class_idx,
+                iou_threshold=iou_threshold
+            )
+            for class_idx
+            in range(num_classes)
+        ]
+        values = [ap.value for ap in per_class]
+        return cls(value=sum(values) / num_classes, per_class=per_class)
