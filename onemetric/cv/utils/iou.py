@@ -20,7 +20,7 @@ def box_iou(
 
     Example:
     ```
-    >>> from onemetric.utils import box_iou
+    >>> from onemetric.cv.utils.iou import box_iou
 
     >>> iou = box_iou_batch(
     ...     boxes_true=(0., 0., 1., 1.),
@@ -72,13 +72,13 @@ def box_iou_batch(boxes_true: np.ndarray, boxes_detection: np.ndarray) -> np.nda
     ```
     >>> import numpy as np
 
-    >>> from onemetric.utils import box_iou_batch
+    >>> from onemetric.cv.utils.iou import box_iou_batch
 
-    >>> boxes_true = boxes_true=np.array([
+    >>> boxes_true = np.array([
     ...     [0., 0., 1., 1.],
     ...     [2., 2., 2.5, 2.5]
     ... ])
-    >>> boxes_detection=np.array([
+    >>> boxes_detection = np.array([
     ...     [0., 0., 1., 1.],
     ...     [2., 2., 2.5, 2.5]
     ... ])
@@ -121,7 +121,7 @@ def mask_iou(mask_true: np.ndarray, mask_detection: np.ndarray) -> Optional[floa
     ```
     >>> import numpy as np
 
-    >>> from onemetric.utils import mask_iou
+    >>> from onemetric.cv.utils.iou import mask_iou
 
     >>> full_mask = np.ones((10, 10)).astype('uint8')
     >>> quarter_mask = np.zeros((10, 10)).astype('uint8')

@@ -5,7 +5,7 @@ from contextlib import ExitStack as DoesNotRaise
 
 import numpy as np
 
-from onemetric.cv.object_detection import ConfusionMatrix
+from onemetric.cv.object_detection.confusion_matrix import ConfusionMatrix
 
 
 @pytest.mark.parametrize(
