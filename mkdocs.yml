@@ -5,8 +5,9 @@ nav:
   - Home: index.md
   - API reference:
       - Computer Vision:
-          - Object Detection: cv/object_detection.md
-          - Intersection over Union: cv/iou.md
+          - Intersection over Union: cv/utils/iou.md
+          - Average Precision: cv/object_detection/average_precision.md
+          - Confusion Matrix: cv/object_detection/confusion_matrix.md
   - Contribution Guide: CONTRIBUTING.md
   - License: LICENSE.md
 

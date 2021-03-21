@@ -55,7 +55,7 @@ class AveragePrecision:
         """
         Calculate average precision (AP) metric based on given precision/recall curve.
         """
-        AveragePrecision._validate_pr(precision=precision, recall=recall)
+        AveragePrecision._validate_precision_recall(precision=precision, recall=recall)
         if precision.shape[0] == 0:
             recall_values = np.array([0., EPSILON])
             precision_values = np.array([1., 0.])
@@ -127,7 +127,7 @@ class AveragePrecision:
             raise ValueError('true_batches and detection_batches must be lists and their lengths must be equal.')
 
     @staticmethod
-    def _validate_pr(recall: np.ndarray, precision: np.ndarray):
+    def _validate_precision_recall(recall: np.ndarray, precision: np.ndarray):
         if type(recall) != np.ndarray or type(precision) != np.ndarray or recall.shape != precision.shape:
             raise ValueError("recall and precision must be 1d np.array with (N, ) shape.")
 
