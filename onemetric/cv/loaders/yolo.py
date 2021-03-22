@@ -3,9 +3,10 @@ from dataclasses import dataclass
 from typing import Generator, List
 
 import numpy as np
+from PIL import Image
 
 from onemetric.cv.loaders.base import DataSetElement, DataSetLoader
-from onemetric.utils.general import list_files_with_extension
+from onemetric.utils.general import list_files_with_extension, read_text_file_lines
 
 IMAGES_EXT = ('.png', '.jpg', '.jpeg')
 ANNOTATION_EXT = '.txt'
@@ -65,4 +66,36 @@ class YOLOLoader(DataSetLoader):
 
     @staticmethod
     def _load_element(entry: DataSetEntry) -> YOLOElement:
-        pass
+        image = np.asarray(Image.open(entry.image_path))
+        image_height, image_width, _ = image.shape
+        annotations = YOLOLoader._load_annotations(
+            annotation_path=entry.annotation_path,
+            image_height=image_height,
+            image_width=image_width
+        )
+        return YOLOElement(image=image, annotations=annotations)
+
+    @staticmethod
+    def _load_annotations(annotation_path: str, image_height: int, image_width: int) -> np.ndarray:
+        raw_annotations = read_text_file_lines(file_path=annotation_path)
+        annotation = np.stack([
+            YOLOLoader._load_annotation(raw_annotation=raw_annotation)
+            for raw_annotation
+            in raw_annotations
+        ])
+        annotation[:, 0] *= image_width
+        annotation[:, 2] *= image_width
+        annotation[:, 1] *= image_height
+        annotation[:, 3] *= image_height
+        return annotation
+
+    @staticmethod
+    def _load_annotation(raw_annotation: str) -> np.ndarray:
+        class_idx, x, y, width, height = raw_annotation.split(' ')
+        return np.array([
+            float(x) - float(width) / 2,
+            float(y) - float(height) / 2,
+            float(x) + float(width) / 2,
+            float(y) + float(height) / 2,
+            int(class_idx)
+        ])

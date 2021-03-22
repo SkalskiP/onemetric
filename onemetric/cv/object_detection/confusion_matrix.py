@@ -54,7 +54,7 @@ class ConfusionMatrix:
 
     def plot(self, target_path: str, title: Optional[str] = None, class_names: Optional[List[str]] = None) -> None:
         """
-        Create a plot of confusion matrix and save it at selected location.
+        Create confusion matrix plot and save it at selected location.
 
         Args:
             target_path: `str` selected target location of confusion matrix plot.
