@@ -22,7 +22,13 @@ class AveragePrecision:
     iou_threshold: Optional[float] = None
 
     @classmethod
-    def from_detections(cls, true_batches: List[np.ndarray], detection_batches: List[np.ndarray], class_idx: int, iou_threshold: float = 0.5) -> AveragePrecision:
+    def from_detections(
+        cls,
+        true_batches: List[np.ndarray],
+        detection_batches: List[np.ndarray],
+        class_idx: int,
+        iou_threshold: float = 0.5
+    ) -> AveragePrecision:
         """
         Calculate average precision (AP) metric based on ground-true and detected objects across all images in concerned dataset.
 
@@ -51,7 +57,13 @@ class AveragePrecision:
         return cls.from_precision_recall(precision=precision, recall=recall, class_idx=class_idx, iou_threshold=iou_threshold)
 
     @classmethod
-    def from_precision_recall(cls, recall: np.ndarray, precision: np.ndarray, class_idx: Optional[int] = None, iou_threshold: Optional[float] = None) -> AveragePrecision:
+    def from_precision_recall(
+        cls,
+        recall: np.ndarray,
+        precision: np.ndarray,
+        class_idx: Optional[int] = None,
+        iou_threshold: Optional[float] = None
+    ) -> AveragePrecision:
         """
         Calculate average precision (AP) metric based on given precision/recall curve.
         """
@@ -75,7 +87,12 @@ class AveragePrecision:
         )
 
     @staticmethod
-    def _evaluate_detection_batch(true_batch: np.ndarray, detection_batch: np.ndarray, class_idx: int, iou_threshold: float) -> np.ndarray:
+    def _evaluate_detection_batch(
+        true_batch: np.ndarray,
+        detection_batch: np.ndarray,
+        class_idx: int,
+        iou_threshold: float
+    ) -> np.ndarray:
         """
         Calculates the intermediate `evaluation_matrix` needed to obtain the precision/recall curve.
         Returns:
