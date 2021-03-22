@@ -1,31 +1,28 @@
 import os
-from dataclasses import dataclass
 from typing import Generator, List
 
 import numpy as np
 from PIL import Image
 
-from onemetric.cv.loaders.base import DataSetElement, DataSetLoader
+from onemetric.cv.loaders.base import DataSetElement, DataSetLoader, DataSetEntry
 from onemetric.utils.general import list_files_with_extension, read_text_file_lines
 
 IMAGES_EXT = ('.png', '.jpg', '.jpeg')
 ANNOTATION_EXT = '.txt'
 
 
-@dataclass(frozen=True)
-class DataSetEntry:
-    image_path: str
-    annotation_path: str
-
-
 class YOLOElement(DataSetElement):
 
-    def __init__(self, image: np.ndarray, annotations: np.ndarray) -> None:
+    def __init__(self, image: np.ndarray, image_path: str, annotations: np.ndarray) -> None:
         self._image = image
+        self._image_path = image_path
         self._annotations = annotations
 
     def get_image(self) -> np.ndarray:
         return self._image
+
+    def get_image_path(self) -> str:
+        return self._image_path
 
     def get_annotations(self) -> np.ndarray:
         return self._annotations
@@ -73,7 +70,7 @@ class YOLOLoader(DataSetLoader):
             image_height=image_height,
             image_width=image_width
         )
-        return YOLOElement(image=image, annotations=annotations)
+        return YOLOElement(image=image, image_path=entry.image_path, annotations=annotations)
 
     @staticmethod
     def _load_annotations(annotation_path: str, image_height: int, image_width: int) -> np.ndarray:

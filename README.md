@@ -1,5 +1,4 @@
 [![PyPI version](https://badge.fury.io/py/onemetric.svg)](https://badge.fury.io/py/onemetric)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/onemetric)
 ![PyPI - License](https://img.shields.io/pypi/l/onemetric)
 [![codecov](https://codecov.io/gh/SkalskiP/onemetric/branch/master/graph/badge.svg?token=ZFSEYF9WN4)](https://codecov.io/gh/SkalskiP/onemetric)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/onemetric)
@@ -51,18 +50,5 @@ Please cite onemetric in your publications if this is useful for your research. 
 
 This project is licensed under the BSD 3 - see the [LICENSE][1] file for details.
 
-## Acknowledgements
-
-Building onemetric would have been much more difficult if not for the efforts and persistence of many open-source developers. Their ideas were the help and inspiration in creating this library. **Thank you!**
-
-1. Confusion Matrix for Object Detection [link](2) by [kaanakan](3).
-2. Mean Average Precision for Object Detection [link](4) by [bes-dev](5).
-3. YOLOv3 in PyTorch [link](6) by [ultralytics](7).
 
 [1]: https://github.com/SkalskiP/onemetric/blob/master/LICENSE
-[2]: https://github.com/kaanakan/object_detection_confusion_matrix
-[3]: https://github.com/kaanakan
-[4]: https://github.com/bes-dev/mean_average_precision
-[5]: https://github.com/bes-dev
-[6]: https://github.com/ultralytics/yolov3
-[7]: https://github.com/ultralytics
