@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Optional, List
 
@@ -6,9 +7,8 @@ import numpy as np
 
 from onemetric.const import EPSILON
 from onemetric.cv.utils.iou import box_iou_batch
-
-
-# Updated version of compute_ap from https://github.com/ultralytics/yolov3
+from onemetric.cv.utils.validators import validate_detections, validate_precision_recall, validate_true_batch, \
+    validate_detection_batch
 
 
 @dataclass(frozen=True)
@@ -38,7 +38,7 @@ class AveragePrecision:
             class_idx: `int` index of the class for which you want to calculate average precision (AP).
             iou_threshold: `float` detection iou  threshold between 0 and 1. Detections with lower iou will be classified as FP.
         """
-        AveragePrecision._validate_detections(true_batches=true_batches, detection_batches=detection_batches)
+        validate_detections(true_batches=true_batches, detection_batches=detection_batches)
         evaluated_detections = np.concatenate([
             AveragePrecision._evaluate_detection_batch(
                 true_batch=true_batch,
@@ -67,7 +67,7 @@ class AveragePrecision:
         """
         Calculate average precision (AP) metric based on given precision/recall curve.
         """
-        AveragePrecision._validate_precision_recall(precision=precision, recall=recall)
+        validate_precision_recall(precision=precision, recall=recall)
         if precision.shape[0] == 0:
             recall_values = np.array([0., EPSILON])
             precision_values = np.array([1., 0.])
@@ -93,13 +93,8 @@ class AveragePrecision:
         class_idx: int,
         iou_threshold: float
     ) -> np.ndarray:
-        """
-        Calculates the intermediate `evaluation_matrix` needed to obtain the precision/recall curve.
-        Returns:
-            evaluation_matrix: 2d `np.ndarray` matrix describing which of the obtained detections is TP and which is FP. `shape = (R, 3)` where `R` is number of detected objects.
-        """
-        _validate_true_batch(true_batch=true_batch)
-        _validate_detection_batch(detection_batch=detection_batch)
+        validate_true_batch(true_batch=true_batch)
+        validate_detection_batch(detection_batch=detection_batch)
 
         true_batch_filtered = true_batch[true_batch[:, 4] == class_idx]
         detection_batch_filtered = detection_batch[detection_batch[:, 4] == class_idx]
@@ -137,30 +132,3 @@ class AveragePrecision:
             matches = matches[matches[:, 2].argsort()[::-1]]
             matches = matches[np.unique(matches[:, 0], return_index=True)[1]]
         return matches
-
-    @staticmethod
-    def _validate_detections(true_batches: List[np.ndarray], detection_batches: List[np.ndarray]):
-        if type(true_batches) != list or type(detection_batches) != list or len(true_batches) != len(detection_batches):
-            raise ValueError('true_batches and detection_batches must be lists and their lengths must be equal.')
-
-    @staticmethod
-    def _validate_precision_recall(recall: np.ndarray, precision: np.ndarray):
-        if type(recall) != np.ndarray or type(precision) != np.ndarray or recall.shape != precision.shape:
-            raise ValueError("recall and precision must be 1d np.array with (N, ) shape.")
-
-
-def _validate_true_batch(true_batch: np.ndarray):
-    if type(true_batch) != np.ndarray or len(true_batch.shape) != 2 or true_batch.shape[1] != 5:
-        raise ValueError(
-            f"True batch must be defined as 2d np.array with (N, 5) shape, where N is number of is number of "
-            f"annotated objects and each row is in (x_min, y_min, x_max, y_max, class) format. {true_batch} given."
-        )
-
-
-def _validate_detection_batch(detection_batch: np.ndarray):
-    if type(detection_batch) != np.ndarray or len(detection_batch.shape) != 2 or detection_batch.shape[1] != 6:
-        raise ValueError(
-            f"Detected batch must be defined as 2d np.array with (M, 6) shape, where M is number of is number of "
-            f"detected objects and each row is in (x_min, y_min, x_max, y_max, class, conf) format. "
-            f"{detection_batch} given."
-        )

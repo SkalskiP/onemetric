@@ -28,7 +28,7 @@ def box_iou(
     ... )
 
     >>> iou
-    0.6
+    ... 0.6
     ```
     """
     _validate_box(box=box_true)
@@ -58,7 +58,7 @@ def box_iou(
 
 def box_iou_batch(boxes_true: np.ndarray, boxes_detection: np.ndarray) -> np.ndarray:
     """
-    Compute Intersection over Union of two sets of bounding boxes - `boxes_true` and b`oxes_detection`. Both sets of
+    Compute Intersection over Union of two sets of bounding boxes - `boxes_true` and `boxes_detection`. Both sets of
     boxes are expected to be in `(x_min, y_min, x_max, y_max)` format.
 
     Args:
@@ -85,7 +85,10 @@ def box_iou_batch(boxes_true: np.ndarray, boxes_detection: np.ndarray) -> np.nda
     >>> iou = box_iou_batch(boxes_true=boxes_true, boxes_detection=boxes_detection)
 
     >>> iou
-    np.array([[1., 0.], [0., 1.]])
+    ... np.array([
+    ...     [1., 0.],
+    ...     [0., 1.]
+    ... ])
     ```
     """
 
@@ -130,7 +133,7 @@ def mask_iou(mask_true: np.ndarray, mask_detection: np.ndarray) -> Optional[floa
     >>> iou = mask_iou(mask_true=full_mask, mask_detection=quarter_mask)
 
     >>> iou
-    0.25
+    ... 0.25
     ```
     """
     _validate_mask(mask=mask_true)

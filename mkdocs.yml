@@ -1,21 +1,57 @@
+# Project information
 site_name: onemetric
+site_url: https://skalskip.github.io/onemetric
 site_author: Piotr Skalski
+site_description: >-
+  One Metrics Library to Rule Them All!
 
+
+# Repository
+repo_name: 'SkalskiP/onemetric'
+repo_url: 'https://github.com/SkalskiP/onemetric'
+edit_uri: ""
+
+
+# Copyright
+copyright: Copyright &copy; 2021 Piotr Skalski
+
+
+# Customization
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/SkalskiP
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/PiotrSkalski92
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/in/piotr-skalski-36b5b4122/
+
+
+# Page tree
 nav:
   - Home: index.md
   - API reference:
       - Computer Vision:
-          - Intersection over Union: cv/utils/iou.md
-          - Average Precision: cv/object_detection/average_precision.md
-          - Confusion Matrix: cv/object_detection/confusion_matrix.md
+          - Metrics:
+            - Intersection over Union: cv/utils/iou.md
+            - Confusion Matrix: cv/object_detection/confusion_matrix.md
+            # - Average Precision: cv/object_detection/average_precision.md
+            - Mean Average Precision: cv/object_detection/mean_average_precision.md
+          # - Loaders:
+          #   - YOLO Dataset: cv/loaders/yolo.md
   - Contribution Guide: CONTRIBUTING.md
   - License: LICENSE.md
 
+
+# Configuration
 theme:
   name: 'material'
   palette:
     primary: 'indigo'
     accent: 'indigo'
+  font:
+    text: Roboto
+    code: Roboto Mono
   logo: 'img/logo.png'
   favicon: 'img/favicon.png'
   features:
@@ -23,15 +59,17 @@ theme:
   icon:
     repo: fontawesome/brands/github
 
-repo_name: 'SkalskiP/onemetric'
-repo_url: 'https://github.com/SkalskiP/onemetric'
 
-
+# Google Analytics
 google_analytics:
   - 'UA-192741363-1'
   - 'auto'
 
 
+# Extensions
 markdown_extensions:
+  - attr_list
+  - def_list
+  - footnotes
   - pymdownx.highlight
   - pymdownx.superfences
