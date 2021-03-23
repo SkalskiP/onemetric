@@ -1,9 +1,9 @@
+import math
 from contextlib import ExitStack as DoesNotRaise
 from typing import Optional, List
 
 import numpy as np
 import pytest
-import math
 
 from onemetric.const import EPSILON
 from onemetric.cv.object_detection.average_precision import AveragePrecision

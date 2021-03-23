@@ -12,29 +12,53 @@ ANNOTATION_EXT = '.txt'
 
 
 class YOLOElement(DataSetElement):
+    """
+    TODO:
+    """
 
     def __init__(self, image: np.ndarray, image_path: str, annotations: np.ndarray) -> None:
+        """
+        TODO:
+        """
         self._image = image
         self._image_path = image_path
         self._annotations = annotations
 
     def get_image(self) -> np.ndarray:
+        """
+        TODO:
+        """
         return self._image
 
     def get_image_path(self) -> str:
+        """
+        TODO:
+        """
         return self._image_path
 
     def get_annotations(self) -> np.ndarray:
+        """
+        TODO:
+        """
         return self._annotations
 
 
 class YOLOLoader(DataSetLoader):
+    """
+    TODO:
+    """
 
     def __init__(self, images_dir_path: str, annotations_dir_path) -> None:
+        """
+        TODO:
+        """
         self._images_dir_path = images_dir_path
         self._annotations_dir_path = annotations_dir_path
 
     def load(self) -> Generator[YOLOElement, None, None]:
+        """
+        TODO:
+        """
         for entry in self._get_entries():
             yield YOLOLoader._load_element(entry=entry)
 

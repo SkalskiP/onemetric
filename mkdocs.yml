@@ -35,10 +35,10 @@ nav:
           - Metrics:
             - Intersection over Union: cv/utils/iou.md
             - Confusion Matrix: cv/object_detection/confusion_matrix.md
-            - Average Precision: cv/object_detection/average_precision.md
+            # - Average Precision: cv/object_detection/average_precision.md
             - Mean Average Precision: cv/object_detection/mean_average_precision.md
-          - Loaders:
-            - YOLO Dataset: cv/loaders/yolo.md
+          # - Loaders:
+          #   - YOLO Dataset: cv/loaders/yolo.md
   - Contribution Guide: CONTRIBUTING.md
   - License: LICENSE.md
 
