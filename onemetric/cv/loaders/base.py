@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import Generator
 
 import numpy as np
@@ -25,9 +24,3 @@ class DataSetLoader(ABC):
     @abstractmethod
     def load(self) -> Generator[DataSetElement, None, None]:
         pass
-
-
-@dataclass(frozen=True)
-class DataSetEntry:
-    image_path: str
-    annotation_path: str

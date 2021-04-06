@@ -4,7 +4,8 @@ from typing import Generator, List
 import numpy as np
 from PIL import Image
 
-from onemetric.cv.loaders.base import DataSetElement, DataSetLoader, DataSetEntry
+from onemetric.cv.loaders.base import DataSetElement, DataSetLoader
+from onemetric.cv.loaders.yolo.dataclasses import DataSetEntry
 from onemetric.utils.general import list_files_with_extension, read_text_file_lines
 
 IMAGES_EXT = ('.png', '.jpg', '.jpeg')

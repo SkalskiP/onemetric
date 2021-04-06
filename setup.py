@@ -24,7 +24,8 @@ setuptools.setup(
         "Pillow",
         "numpy",
         "seaborn",
-        "matplotlib"
+        "matplotlib",
+        "dataclasses-json",
     ],
     extras_require={
         'tests': [
