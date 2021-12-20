@@ -14,6 +14,7 @@
 * Install onemetric from PyPI (recommended):
 
    ```console
+   pip install --upgrade pip
    pip install onemetric
    ```
   
