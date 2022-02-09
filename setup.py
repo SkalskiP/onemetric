@@ -9,7 +9,7 @@ README = (HERE / "README.md").read_text()
 
 setuptools.setup(
     name="onemetric",
-    version='0.1.1',
+    version='0.1.2',
     python_requires=">=3.7",
     description="Metrics Library to Evaluate Machine Learning Algorithms in Python",
     long_description=README,
@@ -18,7 +18,7 @@ setuptools.setup(
     author="Piotr Skalski",
     author_email="piotr.skalski92@gmail.com",
     license='BSD',
-    packages=['onemetric'],
+    packages=setuptools.find_packages(exclude=["tests"]),
     include_package_data=True,
     install_requires=[
         "Pillow",
